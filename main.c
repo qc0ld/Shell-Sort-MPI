@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <mpi.h>
 
-
 void shell_sort(int* array, int n);
 
 int main(int argc, char** argv) {
@@ -36,14 +35,16 @@ int main(int argc, char** argv) {
 
     MPI_Gather(sub_array, n, MPI_INT, sorted_array, n, MPI_INT, 0, MPI_COMM_WORLD);
 
+    if (!rank) {
+        shell_sort(sorted_array, count);
+    }
+
     MPI_Barrier(MPI_COMM_WORLD);
 
+    double end_time = MPI_Wtime();
+
     if (!rank) {
-        printf("Sorted array:\n");
-        for (int i = 0; i < count; i++) {
-            printf("%d\n", sorted_array[i]);
-        }
-        printf("Threads: %d, Execution time: %f seconds\n", size, MPI_Wtime() - start_time);
+        printf("Threads: %d, Execution time: %f seconds\n", size, end_time - start_time);
     }
 
     free(array);
